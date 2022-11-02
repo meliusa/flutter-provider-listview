@@ -1,32 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+// ignore: unused_import
+import 'package:provider_listview/models/task.dart';
 import 'package:provider_listview/service/tasklist.dart';
 
-class AddTaskPage extends StatefulWidget {
-  const AddTaskPage({super.key});
+class EditTaskPage extends StatefulWidget {
+  final String taskName;
+  const EditTaskPage({super.key, required this.taskName});
 
   @override
-  State<AddTaskPage> createState() => _AddTaskPageState();
+  // ignore: override_on_non_overriding_member
+  State<EditTaskPage> createState() => _EditTaskPageState();
 }
 
-class _AddTaskPageState extends State<AddTaskPage> {
+class _EditTaskPageState extends State<EditTaskPage> {
   
+  // ignore: unused_field
   final TextEditingController _textName = TextEditingController();
   final _key = GlobalKey < FormState > ();
-  bool enable = false;
-  static bool _validate = false;
-
-  @override
-  void dispose() {
-    _textName.dispose();
-    super.dispose();
-  }
+  bool enable = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tambah Task Baru"),
+        title: Text("Edit Task ${widget.taskName}"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -35,11 +33,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
             Form(
               key: _key,
               child: TextFormField(
-                controller: _textName,
+                initialValue: widget.taskName,
                 decoration: const InputDecoration(
-                  hintText: "Masukkan Task Baru",
+                  hintText: "Edit Task",
                 ),
-                keyboardType: TextInputType.text,
                 validator: (String? value) {
                   if(value != ''){
                     if(value!.length < 4){
@@ -56,14 +53,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 onChanged: (value) {
                   setState(() {
                     // 2
-                    if(_textName.text.isNotEmpty){
+                    if(value.isNotEmpty){
                       if(value.length < 4){
                         enable = true; 
                       }else{
                         enable = true;
                       }
                     }else{
-                      enable = false;
+                      enable= false;
                     }
                   });
                   context.read<Tasklist>().changeTaskName(value);
@@ -72,23 +69,23 @@ class _AddTaskPageState extends State<AddTaskPage> {
             ),
             const SizedBox(
               height: 50,
-            ),
+            ),  
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: (enable) ? (){
-                      if(_textName.text.isNotEmpty){
+                    onPressed: (enable) ? () {
+                      if(_textName.text.isEmpty){
                         if(_key.currentState!.validate()){
                           _key.currentState!.save();
-                          context.read<Tasklist>().addTask();
+                          context.read<Tasklist>().updateTask(widget.taskName);
                           Navigator.pop(context);
                         }
                       }else{
                         return;
                       }
                     } : null,
-                    child: const Text("Tambah Task Baru"),
+                    child: const Text("Edit Task"),
                   ),
                 ),
               ],
@@ -96,6 +93,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
           ],
         ),
       ),
-    );
+    );;
   }
 }
